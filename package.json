@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch server.ts",
+    "dev": "tsx watch --watch server.ts src",
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,10 +17,13 @@
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/morgan": "^1.9.9",
+    "@types/node": "^25.3.3",
     "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@google/genai": "^1.30.0",
+    "asana": "^3.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
