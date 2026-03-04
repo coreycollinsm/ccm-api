@@ -1,14 +1,16 @@
 import { Router } from "express";
 
 // Route file imports
-import contactRoutes from "./contactRoutes";
 import health from "./health";
+import contactRoutes from "./contactRoutes";
+import trackingRoutes from "./trackingRoutes";
 
 const router = Router();
 
-// Routes begin here
-router.use("/contact", contactRoutes);
 router.use("/health", health);
-// TODO Tracking routes for website visits and button clicks
+
+// Routes begin here
+router.use("/contact", contactRoutes); // contact form submissions
+router.use("/tracking", trackingRoutes); // any web tracking routes
 
 export default router;
