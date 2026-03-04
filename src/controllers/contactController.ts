@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { sendError, sendSuccess } from "../utils/response";
 import { EmailBlacklist } from "../models/BlacklistModels";
+import { checkContactSpam } from "../utils/geminiSpamChecker";
 
 // The contact submission payload we expect
 interface ContactSubmission {
@@ -47,6 +48,7 @@ export const submitContactForm = async (
     }
 
     // Extract the data fro the payload
+    const submission: ContactSubmission = req.body;
     const { firstName, lastName, email, company, message } = req.body; // TODO will use this with an Asana project integration
 
     // 🔎 Search for blacklist entries for both full email + the domain
@@ -68,7 +70,47 @@ export const submitContactForm = async (
       return;
     }
 
-    // TODO use AI to check for spam automatically
+    // 🔎 Ask Gemini if this looks like spam
+    let spamCheckSuccessful = false;
+    console.log("🛡️ Checking for spam with AI");
+
+    try {
+      const verdict = await checkContactSpam(submission);
+      spamCheckSuccessful = true;
+      console.log("🔘 Spam verdict:", verdict);
+
+      if (verdict.isSpam && verdict.confidence >= 0.7) {
+        // 🚫 If it's confidently spam, reject and add to the blacklist
+        // ⚠️ Leave domain blacklisting as manual for now to avoid blocking common domains (gmail)
+
+        // Create the blacklist entry
+        await EmailBlacklist.create({
+          entry: emailLower,
+          reason:
+            verdict.reason ||
+            `Gemini spam verdict (confidence: ${verdict.confidence})`,
+        });
+
+        // Log the blocked submission in the console
+        console.log("🚫 Added blacklist entry due to spam verdict:", {
+          entry: emailLower,
+          confidence: verdict.confidence,
+          reason: verdict.reason,
+          flags: verdict.flags,
+        });
+
+        // Send failure response
+        sendError(res, "Rejected: Suspected Spam", { spam: true }, 403);
+        return;
+      }
+    } catch (spamCheckErr) {
+      // If Gemini fails (like overloaded volume) don't fail the submission, just let it through
+      console.error("⚠️ Gemini spam check failed, bypassing spam filter:", {
+        error: spamCheckErr,
+        email,
+      });
+    }
+
     // TODO create an entry in a custom Asana project
 
     // Contact submission complete
