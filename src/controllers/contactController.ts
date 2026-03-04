@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { sendError, sendSuccess } from "../utils/response";
 import { EmailBlacklist } from "../models/BlacklistModels";
 import { checkContactSpam } from "../utils/geminiSpamChecker";
+import { createContactAsanaTask } from "../utils/asana";
 
 // The contact submission payload we expect
 interface ContactSubmission {
@@ -76,7 +77,7 @@ export const submitContactForm = async (
 
     try {
       const verdict = await checkContactSpam(submission);
-      spamCheckSuccessful = true;
+      if (verdict.isSpam || !verdict.isSpam) spamCheckSuccessful = true;
       console.log("🔘 Spam verdict:", verdict);
 
       if (verdict.isSpam && verdict.confidence >= 0.7) {
@@ -112,9 +113,16 @@ export const submitContactForm = async (
     }
 
     // TODO create an entry in a custom Asana project
+    await createContactAsanaTask({
+      firstName,
+      lastName,
+      email: emailLower,
+      company,
+      message: spamCheckSuccessful ? message : `[BYPASS_SPAM_CHECK] ${message}`, // Set dynamically - if the spam filter failed I want to know in an Asana callout
+    });
 
     // Contact submission complete
-    console.log("✅ Successfully received submission:", {
+    console.log("✅ Successfully received submission into Asana:", {
       firstName,
       email,
     });
