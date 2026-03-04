@@ -1,0 +1,26 @@
+# Node.js specific
+node_modules/
+.DS_Store
+
+# Build artifacts and temporary files
+dist/
+
+# IDE settings and caches
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log files
+logs/*.log
+
+# Other common exclusions
+npm-debug.log*
+yarn-error.log*
+
+# Editor-related files
+*.tmp
+*.log
+*.lock
+
+.env

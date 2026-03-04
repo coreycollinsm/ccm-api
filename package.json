@@ -1,0 +1,31 @@
+{
+  "name": "ccm-api",
+  "version": "1.0.0",
+  "description": "Back end API for coreycollinsm.com",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "CoreyCollinsM",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.3",
+  "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/morgan": "^1.9.9",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "mongoose": "^8.15.0",
+    "morgan": "^1.10.0"
+  }
+}
