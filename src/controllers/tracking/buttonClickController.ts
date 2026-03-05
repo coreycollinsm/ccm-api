@@ -5,7 +5,7 @@ import { ButtonClick } from "../../models/tracking/ButtonClickModel";
 interface ButtonClickPayload {
   page: string;
   buttonId: string;
-  visitId: string;
+  visitId?: string;
   timestamp: string | Date;
 }
 
@@ -23,7 +23,6 @@ const isButtonClickPayload = (
     typeof visit.buttonId === "string" &&
     visit.buttonId.length > 0 &&
     typeof visit.visitId === "string" &&
-    visit.visitId.length > 0 &&
     (typeof visit.timestamp === "string" || visit.timestamp instanceof Date)
   );
 };
@@ -53,7 +52,7 @@ export const createButtonClickRecord = async (
     const buttonClick = await ButtonClick.create({
       page: page.trim(),
       buttonId: buttonId.trim(),
-      visitId: visitId.trim(),
+      visitId: `${visitId ? visitId.trim() : "null"}`,
       timestamp: parsedTimestamp,
     });
 
