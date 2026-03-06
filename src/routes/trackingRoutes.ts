@@ -1,11 +1,15 @@
 import { Router } from "express";
 
 import { createButtonClickRecord } from "../controllers/tracking/buttonClickController";
-import { createWebsiteVisitRecord } from "../controllers/tracking/websiteVisitController";
+import {
+  createWebsiteVisitorRecord,
+  createSessionRecord,
+} from "../controllers/tracking/websiteVisitController";
 
 const router = Router();
 
-router.post("/button-click", createButtonClickRecord);
-router.post("/website-visit", createWebsiteVisitRecord);
+router.post("/button-clicks", createButtonClickRecord);
+router.post("/site-visitors", createWebsiteVisitorRecord);
+router.post("/site-sessions", createSessionRecord);
 
 export default router;

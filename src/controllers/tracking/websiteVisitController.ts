@@ -1,65 +1,78 @@
 import { Request, Response } from "express";
 import { sendError, sendSuccess } from "../../utils/response";
-import { WebsiteVisit } from "../../models/tracking/WebsiteVisitModel";
+import { WebsiteVisitor, Session } from "../../models/tracking/TrackingModels";
 
-interface WebsiteVisitPayload {
-  source: string;
-  placement?: string;
-  timestamp: string | Date;
+export const createWebsiteVisitorRecord = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const websiteVisitor = await WebsiteVisitor.create({});
+    // Convert to a plain string for the frontend
+    const trackingId = websiteVisitor._id.toString();
+
+    console.log("✅ Successful creation of new website visitor");
+
+    sendSuccess(
+      res,
+      "Website visitor recorded successfully",
+      { trackingId },
+      201,
+    );
+  } catch (err) {
+    console.error(
+      "🔥 Unexpected server error in createWebsiteVisitorRecord:",
+      err,
+    );
+
+    sendError(res, "Failed to record website visitor", err, 500);
+  }
+};
+
+interface CreateSessionPayload {
+  trackingId: string;
 }
 
-const isWebsiteVisitPayload = (
+const isCreateSessionPayload = (
   payload: unknown,
-): payload is WebsiteVisitPayload => {
+): payload is CreateSessionPayload => {
   // Ensure submission matches what's expected
   if (!payload || typeof payload !== "object") return false;
 
-  const visit = payload as Partial<WebsiteVisitPayload>;
+  const session = payload as Partial<CreateSessionPayload>;
 
   return (
-    typeof visit.source === "string" &&
-    (visit.placement === undefined || typeof visit.placement === "string") &&
-    (typeof visit.timestamp === "string" || visit.timestamp instanceof Date)
+    typeof session.trackingId === "string" && session.trackingId.length > 0
   );
 };
 
-export const createWebsiteVisitRecord = async (
+export const createSessionRecord = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     // Confirm payload formatting matches expected
-    if (!isWebsiteVisitPayload(req.body)) {
-      sendError(res, "Invalid website visit payload", null, 400);
+    if (!isCreateSessionPayload(req.body)) {
+      sendError(res, "Invalid session creation payload", null, 400);
       return;
     }
 
     // Extract the payload items
-    const { source, placement, timestamp } = req.body;
+    const { trackingId } = req.body;
 
-    // Confirm provided timestamp is formatted correctly
-    const parsedTimestamp = new Date(timestamp);
-    if (Number.isNaN(parsedTimestamp.getTime())) {
-      sendError(res, "Invalid timestamp", null, 400);
-      return;
-    }
+    const session = await Session.create({ trackingId });
+    // Convert to a plain string for the frontend
+    const sessionId = session._id.toString();
 
-    // Create the entry in the model
-    const websiteVisit = await WebsiteVisit.create({
-      source: source.trim(),
-      placement: placement?.trim() ?? "",
-      timestamp: parsedTimestamp,
-    });
+    console.log("✅ Successful creation of session record");
 
-    console.log("✅ Successful recording of website visit");
-    sendSuccess(
-      res,
-      "Website visit recorded successfully",
-      { id: websiteVisit._id },
-      201,
-    );
+    sendSuccess(res, "Session recorded successfully", { sessionId }, 201);
   } catch (err) {
-    console.error("🔥 Unexpected server error in createWebsiteVisit:", err);
-    sendError(res, "Failed to record website visit", err, 500);
+    console.error(
+      "🔥 Unexpected server error in createWebsiteVisitorRecord:",
+      err,
+    );
+
+    sendError(res, "Failed to record website visitor", err, 500);
   }
 };
