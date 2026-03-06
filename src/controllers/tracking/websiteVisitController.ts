@@ -2,11 +2,39 @@ import { Request, Response } from "express";
 import { sendError, sendSuccess } from "../../utils/response";
 import { WebsiteVisitor, Session } from "../../models/tracking/TrackingModels";
 
+interface WebsiteVisitorPayload {
+  consent: "implied" | "accepted" | "declined";
+  consentTimestamp: Date;
+}
+
+const isWebsiteVisitorPayload = (
+  payload: unknown,
+): payload is WebsiteVisitorPayload => {
+  // Ensure submission matches what's expected
+  if (!payload || typeof payload !== "object") return false;
+
+  const visitor = payload as Partial<WebsiteVisitorPayload>;
+
+  return (
+    typeof visitor.consent === "string" &&
+    visitor.consent.length > 0 &&
+    (typeof visitor.consentTimestamp === "string" ||
+      visitor.consentTimestamp instanceof Date)
+  );
+};
+
 export const createWebsiteVisitorRecord = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
+  console.log("👤 Visitor payload received:", req.body);
   try {
+    // Confirm payload formatting matches expected
+    if (!isWebsiteVisitorPayload(req.body)) {
+      sendError(res, "Invalid visitor creation payload", null, 400);
+      return;
+    }
+
     const websiteVisitor = await WebsiteVisitor.create({});
     // Convert to a plain string for the frontend
     const trackingId = websiteVisitor._id.toString();
@@ -50,6 +78,8 @@ export const createSessionRecord = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
+  console.log("📄 Session payload received:", req.body);
+
   try {
     // Confirm payload formatting matches expected
     if (!isCreateSessionPayload(req.body)) {

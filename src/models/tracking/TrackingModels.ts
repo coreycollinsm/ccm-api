@@ -1,10 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface WebsiteVisitorDocument extends Document {
+  consent: "implied" | "accepted" | "declined";
+  consentTimestamp: Date;
   createdAt: Date;
 }
 
 const WebsiteVisitSchema = new Schema<WebsiteVisitorDocument>({
+  consent: { type: String, required: true, default: "implied", index: true },
+  consentTimestamp: { type: Date, default: () => new Date() },
   createdAt: { type: Date, default: () => new Date() },
 });
 
@@ -19,7 +23,7 @@ export interface SessionDocument extends Document {
 }
 
 const SessionSchema = new Schema<SessionDocument>({
-  trackingId: { type: String, required: true },
+  trackingId: { type: String, required: true, index: true },
   createdAt: { type: Date, default: () => new Date() },
 });
 
