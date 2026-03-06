@@ -31,3 +31,15 @@ export const Session = mongoose.model<SessionDocument>(
   "TrackingSession",
   SessionSchema,
 );
+
+export interface OptOutDocument extends Document {
+  trackingId?: String;
+  createdAt: Date;
+}
+
+const OptOutSchema = new Schema<OptOutDocument>({
+  trackingId: { type: String, required: false, index: true },
+  createdAt: { type: Date, default: () => new Date() },
+});
+
+export const OptOut = mongoose.model<OptOutDocument>("OptOut", OptOutSchema);

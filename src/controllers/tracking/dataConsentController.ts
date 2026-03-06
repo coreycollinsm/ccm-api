@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { sendError, sendSuccess } from "../../utils/response";
-import { WebsiteVisitor, Session } from "../../models/tracking/TrackingModels";
+import {
+  WebsiteVisitor,
+  Session,
+  OptOut,
+} from "../../models/tracking/TrackingModels";
 
 interface WebsiteVisitorPayload {
   consent: "implied" | "accepted" | "declined";
@@ -97,6 +101,56 @@ export const createSessionRecord = async (
     console.log("✅ Successful creation of session record");
 
     sendSuccess(res, "Session recorded successfully", { sessionId }, 201);
+  } catch (err) {
+    console.error(
+      "🔥 Unexpected server error in createWebsiteVisitorRecord:",
+      err,
+    );
+
+    sendError(res, "Failed to record website visitor", err, 500);
+  }
+};
+
+interface ConcentOptOutPayload {
+  trackingId?: string;
+}
+
+const isConcentOptOutPayload = (
+  payload: unknown,
+): payload is ConcentOptOutPayload => {
+  // Ensure submission matches what's expected
+  if (!payload || typeof payload !== "object") return false;
+
+  const optOut = payload as Partial<ConcentOptOutPayload>;
+
+  return typeof optOut.trackingId === "string";
+};
+
+export const consentOptOut = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  console.log("📵 Concent opt-out payload received:", req.body);
+  try {
+    // Confirm payload formatting matches expected
+    if (!isConcentOptOutPayload(req.body)) {
+      sendError(res, "Invalid consent opt-out payload", null, 400);
+      return;
+    }
+
+    const { trackingId } = req.body;
+
+    await WebsiteVisitor.deleteOne({
+      _id: trackingId,
+    });
+
+    const optOutEntry = await OptOut.create({
+      trackingId,
+    });
+
+    console.log("✅ Opted-out user:", optOutEntry);
+
+    sendSuccess(res, "Website visitor opted-out successfully", null, 201);
   } catch (err) {
     console.error(
       "🔥 Unexpected server error in createWebsiteVisitorRecord:",
