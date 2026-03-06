@@ -152,11 +152,70 @@ export const consentOptOut = async (
 
     sendSuccess(res, "Website visitor opted-out successfully", null, 201);
   } catch (err) {
-    console.error(
-      "🔥 Unexpected server error in createWebsiteVisitorRecord:",
-      err,
+    console.error("🔥 Unexpected server error in consentOptOut:", err);
+
+    sendError(res, "Failed to opt-out:", err, 500);
+  }
+};
+
+interface ConcentOptInPayload {
+  trackingId: string;
+  timestamp: Date;
+}
+
+const isConcentOptInPayload = (
+  payload: unknown,
+): payload is ConcentOptInPayload => {
+  // Ensure submission matches what's expected
+  if (!payload || typeof payload !== "object") return false;
+
+  const optIn = payload as Partial<ConcentOptInPayload>;
+
+  return (
+    typeof optIn.trackingId === "string" &&
+    optIn.trackingId.length > 0 &&
+    (typeof optIn.timestamp === "string" || optIn.timestamp instanceof Date)
+  );
+};
+
+export const consentOptIn = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  console.log("☑️ Concent opt-in payload received:", req.body);
+  try {
+    // Confirm payload formatting matches expected
+    if (!isConcentOptInPayload(req.body)) {
+      sendError(res, "Invalid consent opt-in payload", null, 400);
+      return;
+    }
+
+    const { trackingId, timestamp } = req.body;
+
+    const updatedRecord = await WebsiteVisitor.updateOne(
+      {
+        _id: trackingId,
+      },
+      {
+        $set: {
+          consent: "accepted",
+          consentTimestamp: timestamp,
+        },
+      },
     );
 
-    sendError(res, "Failed to record website visitor", err, 500);
+    const { acknowledged, matchedCount, modifiedCount } = updatedRecord;
+    if (!acknowledged || matchedCount != modifiedCount) {
+      console.error("Error updating opt-in record in db");
+      sendError(res, "Error updating opt-in record in db", null, 500);
+    }
+
+    console.log("✅ Opted-in user:", trackingId);
+
+    sendSuccess(res, "Website visitor opted-in successfully", null, 201);
+  } catch (err) {
+    console.error("🔥 Unexpected server error in consentOptIn:", err);
+
+    sendError(res, "Failed to opt-in:", err, 500);
   }
 };
