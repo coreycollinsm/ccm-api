@@ -5,7 +5,7 @@ import { ButtonClick } from "../../models/tracking/ButtonClickModel";
 interface ButtonClickPayload {
   page: string;
   buttonId: string;
-  visitId?: string;
+  sessionId: string;
   timestamp: string | Date;
 }
 
@@ -15,15 +15,16 @@ const isButtonClickPayload = (
   // Ensure submission matches what's expected
   if (!payload || typeof payload !== "object") return false;
 
-  const visit = payload as Partial<ButtonClickPayload>;
+  const click = payload as Partial<ButtonClickPayload>;
 
   return (
-    typeof visit.page === "string" &&
-    visit.page.length > 0 &&
-    typeof visit.buttonId === "string" &&
-    visit.buttonId.length > 0 &&
-    typeof visit.visitId === "string" &&
-    (typeof visit.timestamp === "string" || visit.timestamp instanceof Date)
+    typeof click.page === "string" &&
+    click.page.length > 0 &&
+    typeof click.buttonId === "string" &&
+    click.buttonId.length > 0 &&
+    typeof click.sessionId === "string" &&
+    click.sessionId.length > 0 &&
+    (typeof click.timestamp === "string" || click.timestamp instanceof Date)
   );
 };
 
@@ -39,7 +40,7 @@ export const createButtonClickRecord = async (
     }
 
     // Extract the payload items
-    const { page, buttonId, visitId, timestamp } = req.body;
+    const { page, buttonId, sessionId, timestamp } = req.body;
 
     // Confirm provided timestamp is formatted correctly
     const parsedTimestamp = new Date(timestamp);
@@ -52,7 +53,7 @@ export const createButtonClickRecord = async (
     const buttonClick = await ButtonClick.create({
       page: page.trim(),
       buttonId: buttonId.trim(),
-      visitId: `${visitId ? visitId.trim() : "null"}`,
+      sessionId,
       timestamp: parsedTimestamp,
     });
 
