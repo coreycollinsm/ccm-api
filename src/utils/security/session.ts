@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { Response } from "express";
+import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { AuthSession } from "../../models";
 
@@ -46,4 +46,47 @@ export const setSessionCookie = (
     expires: session.sessionExpiresAt,
     path: "/",
   });
+};
+
+export const getSessionIdFromCookie = (req: Request): string | null => {
+  const rawCookie = req.headers.cookie;
+  if (!rawCookie) return null;
+
+  const cookies = rawCookie.split(";");
+  for (const cookie of cookies) {
+    const [name, ...rest] = cookie.trim().split("=");
+    if (name === "sessionId") {
+      const value = rest.join("=");
+      return value.length > 0 ? decodeURIComponent(value) : null;
+    }
+  }
+
+  return null;
+};
+
+export const clearSessionCookie = (res: Response): void => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.clearCookie("sessionId", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+  });
+};
+
+export const deleteSessionAndCookie = async (
+  req: Request,
+  res: Response,
+): Promise<boolean> => {
+  const sessionId = getSessionIdFromCookie(req);
+
+  clearSessionCookie(res);
+
+  if (!sessionId) {
+    return false;
+  }
+
+  const deletedSession = await AuthSession.findOneAndDelete({ sessionId });
+  return Boolean(deletedSession);
 };
