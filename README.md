@@ -20,10 +20,24 @@ A lightweight analytics backend that captures website visits, attribution source
 
 ## Tech Stack
 
-Node.js
-Express
-MongoDB
-TypeScript
+### Technologies
 
-Google GenAI
-Asana API
+- Node.js
+- Express
+- MongoDB
+- TypeScript
+
+### Integrations
+
+- Google GenAI
+- Asana API
+
+---
+
+#### AI Disclaimer
+
+_I would like it to be known that I intentionally use emojis in this codebase 🤣_
+
+_I feel like it's a necessary callout, given how AI always inserts them. I actually picked up this habit from messing around with AI, but just for the record, this is me and not AI auto-adding them. AI has ruined a lot of my own design patterns in this way._
+
+_But just know that I am only using AI as a resource to help correct and research, and not directly implement, other than potentially cleaning up entries that I already would know how to fix (busywork). Any time AI is used, I double-check and ensure that I know exactly what's being changed before inserting it into the repo._
