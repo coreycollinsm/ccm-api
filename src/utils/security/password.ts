@@ -1,3 +1,5 @@
+const MIN_PASSWORD_LENGTH = 8;
+
 /**
  * Validates password complexity requirements
  * @returns Object with isValid flag and error message if invalid
@@ -6,6 +8,12 @@ export function validatePasswordComplexity(password: string): {
   isValid: boolean;
   error?: string;
 } {
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return {
+      isValid: false,
+      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+    };
+  }
   if (!/[A-Z]/.test(password)) {
     return {
       isValid: false,

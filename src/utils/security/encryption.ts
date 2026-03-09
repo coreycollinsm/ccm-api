@@ -1,6 +1,9 @@
 import { randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+const IV_LENGTH = 12;
+const AUTH_TAG_LENGTH = 16;
+const MIN_ENCRYPTED_LENGTH = IV_LENGTH + AUTH_TAG_LENGTH;
 
 if (!ENCRYPTION_KEY) {
   throw new Error("ENCRYPTION_KEY is not set");
@@ -14,7 +17,7 @@ if (KEY.length !== 32) {
 }
 
 export function encryptString(plaintext: string): Buffer {
-  const iv = randomBytes(12); // recommended for GCM
+  const iv = randomBytes(IV_LENGTH);
   const cipher = createCipheriv("aes-256-gcm", KEY, iv);
 
   const encrypted = Buffer.concat([
@@ -28,9 +31,13 @@ export function encryptString(plaintext: string): Buffer {
 }
 
 export function decryptString(ciphertext: Buffer): string {
-  const iv = ciphertext.subarray(0, 12);
-  const authTag = ciphertext.subarray(12, 28);
-  const encrypted = ciphertext.subarray(28);
+  if (ciphertext.length <= MIN_ENCRYPTED_LENGTH) {
+    throw new Error("Invalid ciphertext payload");
+  }
+
+  const iv = ciphertext.subarray(0, IV_LENGTH);
+  const authTag = ciphertext.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
+  const encrypted = ciphertext.subarray(IV_LENGTH + AUTH_TAG_LENGTH);
   const decipher = createDecipheriv("aes-256-gcm", KEY, iv);
   decipher.setAuthTag(authTag);
   return decipher.update(encrypted, undefined, "utf8") + decipher.final("utf8");
