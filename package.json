@@ -12,8 +12,9 @@
   "keywords": [],
   "author": "CoreyCollinsM",
   "license": "ISC",
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.31.0",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/morgan": "^1.9.9",
@@ -24,6 +25,7 @@
   "dependencies": {
     "@google/genai": "^1.30.0",
     "asana": "^3.1.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
