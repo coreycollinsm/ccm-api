@@ -7,3 +7,4 @@ export * from "./response";
 export * from "./security/encryption";
 export * from "./security/hashing";
 export * from "./security/password";
+export * from "./security/session";

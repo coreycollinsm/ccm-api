@@ -1,12 +1,13 @@
-import crypto from "node:crypto";
 import { Request, Response } from "express";
-import { AuthSession, User } from "../../models";
+import { User } from "../../models";
 import {
+  createSessionRecord,
   createEmailLookupId,
   encryptString,
   hashPassword,
   sendError,
   sendSuccess,
+  setSessionCookie,
   validatePasswordComplexity,
 } from "../../utils";
 import { formatUserResponse } from "./me";
@@ -81,35 +82,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       password: passwordHash,
       role: "standard",
     });
-
     await user.save();
-
     console.log("👤 User created in db");
 
-    // Create the sessionId and expiration
-    const sessionId = crypto.randomBytes(32).toString("hex");
-    const sessionExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-
-    // Create the session entry
-    const session = new AuthSession({
-      userId: user._id,
-      sessionId,
-      expiresAt: sessionExpiresAt,
-    });
-
-    await session.save();
-
-    console.log("📋 Session created in db");
-
-    // Set secure and samesite in production
-    const isProduction = process.env.NODE_ENV === "production";
-    res.cookie("sessionId", sessionId, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      expires: sessionExpiresAt,
-      path: "/",
-    });
+    // Create the session & cookie
+    const session = await createSessionRecord(user._id);
+    setSessionCookie(res, session);
 
     console.log("✅ User creation successful");
 
