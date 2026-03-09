@@ -7,6 +7,6 @@ const router = Router();
 router.post("/register", register);
 
 // TODO Protected Route
-router.post("/me", getCurrentUser);
+router.get("/me", getCurrentUser);
 
 export default router;

@@ -1,32 +1,24 @@
 import { Request, Response } from "express";
-import { User } from "../../models/UserModel";
+import { AuthSession, User } from "../../models";
 import { sendError } from "../../utils/response";
 import { decryptString } from "../../utils";
 
-interface AuthRequest extends Request {
-  userId?: string;
-  user?: {
-    userId?: string;
-    id?: string;
-  };
-}
-
-const extractUserId = (req: AuthRequest): string | null => {
-  const bodyUserId =
-    req.body &&
-    typeof req.body === "object" &&
-    typeof (req.body as { userId?: unknown }).userId === "string"
-      ? (req.body as { userId: string }).userId
-      : null;
-
-  const resolvedUserId =
-    req.userId ?? req.user?.userId ?? req.user?.id ?? bodyUserId;
-  if (!resolvedUserId) {
+const getCookieValue = (req: Request, cookieName: string): string | null => {
+  const rawCookie = req.headers.cookie;
+  if (!rawCookie) {
     return null;
   }
 
-  const trimmed = resolvedUserId.trim();
-  return trimmed.length > 0 ? trimmed : null;
+  const cookies = rawCookie.split(";");
+  for (const cookie of cookies) {
+    const [name, ...rest] = cookie.trim().split("=");
+    if (name === cookieName) {
+      const value = rest.join("=");
+      return value.length > 0 ? decodeURIComponent(value) : null;
+    }
+  }
+
+  return null;
 };
 
 export const formatUserResponse = (user: any) => {
@@ -42,13 +34,23 @@ export const formatUserResponse = (user: any) => {
 
 export const getCurrentUser = async (req: Request, res: Response) => {
   try {
-    const authReq = req as AuthRequest;
-    const userId = extractUserId(authReq);
-    if (!userId) {
+    const sessionId = getCookieValue(req, "sessionId");
+    if (!sessionId) {
       sendError(res, "Unauthorized", null, 401);
       return;
     }
-    const user = await User.findById(userId);
+
+    const session = await AuthSession.findOne({
+      sessionId,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!session) {
+      sendError(res, "Unauthorized", null, 401);
+      return;
+    }
+
+    const user = await User.findById(session.userId);
 
     if (!user) {
       sendError(res, "User not found", null, 404);

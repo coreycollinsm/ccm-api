@@ -9,6 +9,13 @@ const app = express();
 
 // Middleware
 app.use(corsMiddleware); // Origin restrictions
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  );
+  next();
+});
 app.use(express.json()); // Express JSON init
 app.use(morgan("dev")); // Minimal console logging
 app.use(errorHandler); // Avoid crash on errors

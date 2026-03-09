@@ -1,5 +1,6 @@
+import crypto from "node:crypto";
 import { Request, Response } from "express";
-import { User } from "../../models";
+import { AuthSession, User } from "../../models";
 import {
   createEmailLookupId,
   encryptString,
@@ -34,6 +35,8 @@ const isRegisterSubmission = (
 // Register endpoint
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log("📨 Received new user registration payload:", req.body);
+
     if (!isRegisterSubmission(req.body)) {
       console.error("❌ Invalid register submission payload:", req.body);
       sendError(
@@ -81,7 +84,34 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     await user.save();
 
-    // TODO Create a session in the db and set cookies
+    console.log("👤 User created in db");
+
+    // Create the sessionId and expiration
+    const sessionId = crypto.randomBytes(32).toString("hex");
+    const sessionExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
+
+    // Create the session entry
+    const session = new AuthSession({
+      userId: user._id,
+      sessionId,
+      expiresAt: sessionExpiresAt,
+    });
+
+    await session.save();
+
+    console.log("📋 Session created in db");
+
+    // Set secure and samesite in production
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("sessionId", sessionId, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      expires: sessionExpiresAt,
+      path: "/",
+    });
+
+    console.log("✅ User creation successful");
 
     sendSuccess(
       res,
