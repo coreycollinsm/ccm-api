@@ -50,7 +50,7 @@ export const submitContactForm = async (
 
     // Extract the data fro the payload
     const submission: ContactSubmission = req.body;
-    const { firstName, lastName, email, company, message } = req.body; // TODO will use this with an Asana project integration
+    const { firstName, lastName, email, company, message } = req.body;
 
     // 🔎 Search for blacklist entries for both full email + the domain
     const emailLower = email.toLowerCase(); // normalized for search
@@ -112,7 +112,6 @@ export const submitContactForm = async (
       });
     }
 
-    // TODO create an entry in a custom Asana project
     await createContactAsanaTask({
       firstName,
       lastName,
