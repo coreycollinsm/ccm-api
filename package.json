@@ -1,6 +1,7 @@
 {
   "name": "ccm-api",
   "version": "1.0.0",
+  "type": "module",
   "description": "Back end API for coreycollinsm.com",
   "main": "dist/server.js",
   "scripts": {

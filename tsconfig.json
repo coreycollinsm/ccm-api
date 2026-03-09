@@ -15,6 +15,6 @@
 
     "skipLibCheck": true
   },
-  "include": ["server.ts", "src/**/*.ts"],
+  "include": ["server.ts", "src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules", "dist"]
 }
