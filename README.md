@@ -1,54 +1,74 @@
-# Portfolio Analytics & Contact API
+# CCM Analytics & Contact API
 
-A lightweight analytics backend that captures website visits, attribution sources, UI interaction events + handles contact form submissions.
-
-<br>
-
-## Features
-
-### Analytics
-
-- anonymous visit tracking
-- UTM attribution capture
-- button click event logging
-- session deduplication
-- MongoDB analytics storage
-
-### Integrations
-
-- AI spam checking
-- MongoDB blacklisting
-- Custom Asana integration
+Backend service powering the **CCM platform**.  
+This API handles analytics event ingestion, attribution tracking, and contact form submissions with spam filtering and workflow automation.
 
 <br>
 
-## Tech Stack
+# System Role
 
-### Technologies
-
-- Node.js
-- Express
-- MongoDB
-- TypeScript
-
-### Integrations
-
-- Google GenAI
-- Asana API
+| Layer            | Responsibility                                  |
+| ---------------- | ----------------------------------------------- |
+| **Frontend**     | Next.js applications (`ccm-site`, `ccm-portal`) |
+| **Backend**      | Node.js / Express API (this repository)         |
+| **Database**     | MongoDB / MongoDB Atlas                         |
+| **Integrations** | Gemini AI, Asana API                            |
 
 <br>
 
-## Repo Links
+# Core Features
 
-- [Front-end CCM](https://github.com/coreycollinsm/coreycollinsm)
-- [CCM Portal](https://github.com/coreycollinsm/ccm-portal)
+| Area                   | Capabilities                                                                                                                            |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Analytics**          | Anonymous visit tracking<br>UTM attribution capture<br>Button click event logging<br>Session deduplication<br>MongoDB analytics storage |
+| **Contact Automation** | Contact form ingestion<br>AI-assisted spam filtering<br>MongoDB blacklist validation<br>Automated task creation in Asana                |
+| **Event Tracking**     | Visit attribution capture<br>UI interaction tracking<br>Event ingestion API                                                             |
 
 <br>
 
-## AI Disclaimer
+# API Routes
 
-_I would like it to be known that I intentionally use emojis in this codebase 🤣_
+| Method | Route                     | Purpose                                                                                |
+| ------ | ------------------------- | -------------------------------------------------------------------------------------- |
+| GET    | `/health`                 | Health check endpoint for monitoring service uptime                                    |
+| POST   | `/contact`                | Handles portfolio contact form submissions with spam filtering and workflow automation |
+| POST   | `/tracking/website-visit` | Logs initial page visit and generates an anonymous session ID                          |
+| POST   | `/tracking/button-click`  | Records UI interaction events tied to a visit session                                  |
 
-_I feel like it's a necessary callout, given how AI always inserts them. I actually picked up this habit from messing around with AI, but just for the record, this is me and not AI auto-adding them. AI has ruined a lot of my own design patterns in this way._
+<br>
 
-_But just know that I am only using AI as a resource to help correct and research, and not directly implement, other than potentially cleaning up entries that I already would know how to fix (busywork). Any time AI is used, I double-check and ensure that I know exactly what's being changed before inserting it into the repo._
+# Tech Stack
+
+| Category           | Technologies           |
+| ------------------ | ---------------------- |
+| **Runtime**        | Node.js                |
+| **Framework**      | Express                |
+| **Language**       | TypeScript             |
+| **Database**       | MongoDB, MongoDB Atlas |
+| **AI Integration** | Google Gemini          |
+| **Automation**     | Asana API              |
+
+<br>
+
+# CCM Platform Repositories
+
+| Repository     | Purpose                        |
+| -------------- | ------------------------------ |
+| **ccm-site**   | Next.js portfolio frontend     |
+| **ccm-portal** | Next.js portal dashboard       |
+| **ccm-api**    | Analytics + automation backend |
+
+| Repo         | Link                                        |
+| ------------ | ------------------------------------------- |
+| CCM Frontend | https://github.com/coreycollinsm/ccm-site   |
+| CCM Portal   | https://github.com/coreycollinsm/ccm-portal |
+
+<br>
+
+# AI Usage Note
+
+AI tools are occasionally used for research, debugging assistance, and code cleanup tasks.
+
+All implementation decisions, architecture, and final code are written and reviewed manually before being added to the repository.
+
+Yes — the emojis are intentional 🙂
