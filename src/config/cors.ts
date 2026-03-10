@@ -5,8 +5,8 @@ const env = process.env.NODE_ENV || "production";
 // Begin Config
 const allowedOrigins =
   env === "development"
-    ? ["http://localhost:3000"] // Default port for NextJS
-    : ["https://coreycollinsm.com"];
+    ? ["http://localhost:3000", "http://localhost:3001"] // Default port for NextJS
+    : ["https://coreycollinsm.com", "https://portal.coreycollinsm.com"];
 
 console.log("Allowed Origins:", allowedOrigins); // Log in the console on start
 
