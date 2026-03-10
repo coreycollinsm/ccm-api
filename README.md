@@ -2,6 +2,8 @@
 
 A lightweight analytics backend that captures website visits, attribution sources, UI interaction events + handles contact form submissions.
 
+<br>
+
 ## Features
 
 ### Analytics
@@ -18,6 +20,8 @@ A lightweight analytics backend that captures website visits, attribution source
 - MongoDB blacklisting
 - Custom Asana integration
 
+<br>
+
 ## Tech Stack
 
 ### Technologies
@@ -32,9 +36,16 @@ A lightweight analytics backend that captures website visits, attribution source
 - Google GenAI
 - Asana API
 
----
+<br>
 
-#### AI Disclaimer
+## Repo Links
+
+- [Front-end CCM](https://github.com/coreycollinsm/coreycollinsm)
+- [CCM Portal](https://github.com/coreycollinsm/ccm-portal)
+
+<br>
+
+## AI Disclaimer
 
 _I would like it to be known that I intentionally use emojis in this codebase 🤣_
 
