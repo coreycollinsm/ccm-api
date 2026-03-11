@@ -37,6 +37,9 @@ export const setSessionCookie = (
   session: SessionPayload,
 ): void => {
   const isProduction = process.env.NODE_ENV === "production";
+  const cookieDomain = isProduction
+    ? process.env.SESSION_COOKIE_DOMAIN ?? ".coreycollinsm.com"
+    : undefined;
   console.log("🍪 Setting cookie...");
 
   res.cookie("sessionId", session.sessionId, {
@@ -45,6 +48,7 @@ export const setSessionCookie = (
     sameSite: isProduction ? "none" : "lax",
     expires: session.sessionExpiresAt,
     path: "/",
+    domain: cookieDomain,
   });
 };
 
@@ -66,12 +70,16 @@ export const getSessionIdFromCookie = (req: Request): string | null => {
 
 export const clearSessionCookie = (res: Response): void => {
   const isProduction = process.env.NODE_ENV === "production";
+  const cookieDomain = isProduction
+    ? process.env.SESSION_COOKIE_DOMAIN ?? ".coreycollinsm.com"
+    : undefined;
 
   res.clearCookie("sessionId", {
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
     path: "/",
+    domain: cookieDomain,
   });
 };
 
